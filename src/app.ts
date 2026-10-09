@@ -2,24 +2,31 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import config from "./config";
 import cookieParser from "cookie-parser";
+import httpStatus from "http-status";
 import { prisma } from "./lib/prisma";
+import bcrypt from "bcryptjs";
+import { dmmfToRuntimeDataModel } from "@prisma/client/runtime/client";
+import { userRouter } from "./modules/user/user.route";
 
-const app:Application=express();
+const app: Application = express();
 
 // Middlewares (Express build in middlewares)
 
-app.use(cors({
-   origin: config.app_url,
-   credentials:true
-}));
+app.use(
+  cors({
+    origin: config.app_url,
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get("/", async(req:Request, res:Response)=>{
-    res.send("Hello World");
+app.get("/", async (req: Request, res: Response) => {
+  res.send("Hello World");
 });
 
-export default app;
+app.use("/api/users", userRouter);
 
+export default app;
