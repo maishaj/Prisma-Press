@@ -14,3 +14,6 @@ router.put("/:postId",auth(Role.USER,Role.ADMIN,Role.AUTHOR),postController.upda
 router.delete("/:postId",auth(Role.USER,Role.ADMIN,Role.AUTHOR),postController.deletePost);
 
 export const postRoutes=router;
+
+
+

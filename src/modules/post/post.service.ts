@@ -55,31 +55,41 @@ const getMyPosts=async(authorId:string)=>{
 }
 
 const getPostById=async(postId:string)=>{
-     const getPostById=await prisma.post.findUniqueOrThrow({
-        where:{
-            id:postId
-        }
-     })
-
-     const updatedPost=await prisma.post.update({
-        where:{
-            id:postId
-        },
-        data:{
-            views:{
-                increment:1
-            }
-        },
-        include:{
-            author:{
-                omit:{
-                    password:true
+    const transactionResult=await prisma.$transaction(
+        async(tx)=>{
+            await tx.post.update({
+                where:{
+                    id:postId
+                },
+                data:{
+                    views:{
+                        increment:1
+                    }
                 }
-            },
-            comments:true
+            });
+
+            const post=await tx.post.findUniqueOrThrow({
+                where:{
+                    id:postId
+                },
+                include:{
+                    author:{
+                        omit:{
+                            password:true
+                        }
+                    },
+                    comments:true,
+                    _count:{
+                        select:{
+                            comments:true
+                        }
+                    }
+                }
+            });
+            return post;
         }
-     })
-     return updatedPost;
+    );
+    return transactionResult;
 }
 
 const updatePost=async(postId:string, payload:IUpdatePostPayload, authorId:string, isAdmin:boolean)=>{
