@@ -92,6 +92,23 @@ const getAllPosts=async()=>{
         //    ]
         // },
 
+        // 5. Pagination:-
+        // take:1,
+        // skip:3,
+
+        // For first page skip=0
+        // For skip=1, // Visiting Page=2
+        // For skip=2, // Visiting Page=3
+
+        //Page=4, limit/take=1 =>  skip:(page-1)*limit =>(4-1)*1=3
+
+        // 6. Sorting:-
+        // orderBy:{
+        //     createdAt:"desc",
+        //     title:"asc",
+        //     content:"desc"
+        // },
+
         include:{
             author:{
                 omit:{
