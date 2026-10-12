@@ -14,6 +14,84 @@ const createPost=async(payload:ICreatePostPayload, userId:string)=>{
 
 const getAllPosts=async()=>{
     const posts=await prisma.post.findMany({
+
+        // 1. Filtering/Exact Match without AND Operator in multiple fields:-
+
+        // where:{
+        //     title:"My Third Post",
+        //     content:"Prisma"
+        // },
+
+        // 2. Filtering/Exact Match with AND Operator:-
+
+        // where:{
+        //     AND:[
+        //         {
+        //            title:"My Third Post",
+        //         },
+        //         {
+        //             content:"Prisma"
+        //         },
+        //         {
+        //             tags:{
+        //                 equals:[
+        //                     "TypeScript"
+        //                 ]
+        //             }
+        //         }
+        //     ]
+        // },
+
+        // 3. Searching/Partial Search with OR Operator:-
+
+        // where:{
+        //     OR:[
+        //         {
+        //             title:{
+        //                 contains:"Ronaldo",
+        //                 mode:"insensitive"
+        //             }
+        //         },
+        //         {
+        //             content:{
+        //                 contains:"Ron",
+        //                 mode:"insensitive"
+        //             }
+        //         }
+        //     ]
+        // },
+
+        // 4. Combining Searching(OR Operator) and Filtering(AND Operator):-
+
+        // where:{
+        //    //Filtering:-
+        //    AND:[
+        //     {
+        //       //Searching:-
+        //       OR:[
+        //         {
+        //            title:{
+        //             contains:"Ron",
+        //             mode:"insensitive"
+        //            }
+        //         },
+        //         {
+        //            content:{
+        //             contains:"Ron",
+        //             mode:"insensitive"
+        //            }
+        //         }
+        //       ]
+        //     },
+        //     {
+        //        title:"Ronaldo Nazario"
+        //     },
+        //     {
+        //        content:"Ronaldo"
+        //     }
+        //    ]
+        // },
+
         include:{
             author:{
                 omit:{
