@@ -1,4 +1,5 @@
 import { CommentStatus, PostStatus } from "../../../generated/prisma/enums";
+import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma"
 import { ICreatePostPayload, IPostQuery, IUpdatePostPayload } from "./post.interface"
 
@@ -20,6 +21,69 @@ const getAllPosts=async(query:IPostQuery)=>{
 
     const sortBy=query.sortBy? query.sortBy:"createdAt";
     const sortOrder=query.sortOrder? query.sortOrder:"desc";
+
+    const tags=query.tags?JSON.parse(query.tags as string):null;
+    const tagsArray=Array.isArray(tags)? tags:[];
+
+
+    const andConditions:PostWhereInput[]=[];
+
+    if(query.searchTerm){
+        andConditions.push({
+            OR:[
+                {
+                    title:{
+                        contains:query.searchTerm,
+                        mode:"insensitive"
+                    }
+                    },
+                    {
+                    content:{
+                        contains:query.searchTerm,
+                        mode:"insensitive"
+                    }
+                }
+            ]
+        })
+    }
+
+    if(query.title){
+        andConditions.push({
+            title:query.title
+        })
+    }
+
+    if(query.content){
+        andConditions.push({
+            content:query.content
+        })
+    }
+
+    if(query.authorId){
+        andConditions.push({
+            authorId:query.authorId
+        })
+    }
+    
+    if(query.isFeatured){
+        andConditions.push({
+            isFeatured:query.isFeatured
+        })
+    }
+
+    if(query.tags){
+        andConditions.push({
+            tags:{
+                hasSome:tagsArray
+            }
+        })
+    }
+
+    if(query.status){
+        andConditions.push({
+            status:query.status
+        })
+    }
 
     const posts=await prisma.post.findMany({
 
@@ -119,35 +183,41 @@ const getAllPosts=async(query:IPostQuery)=>{
 
         // 7. ** API REQUEST QUERY **
 
+          // Dynamic filtering, Searching 
+        // where:{
+        //     AND:[
+        //         query.searchTerm?{
+        //           OR:[
+        //             {
+        //               title:{
+        //                 contains:query.searchTerm,
+        //                 mode:"insensitive"
+        //               }
+        //             },
+        //             {
+        //                content:{
+        //                 contains:query.searchTerm,
+        //                 mode:"insensitive"
+        //                }
+        //             }
+        //           ]
+        //         }:{},
+        //         query.title? {title:query.title}:{},
+        //         query.content? {content:query.content}:{}
+        //     ]
+        // },
+
         where:{
-            AND:[
-                query.searchTerm?{
-                  OR:[
-                    {
-                      title:{
-                        contains:query.searchTerm,
-                        mode:"insensitive"
-                      }
-                    },
-                    {
-                       content:{
-                        contains:query.searchTerm,
-                        mode:"insensitive"
-                       }
-                    }
-                  ]
-                }:{},
-                query.title? {title:query.title}:{},
-                query.content? {content:query.content}:{}
-            ]
+            AND:andConditions
         },
 
+          // Dynamic Pagination Sorting
         orderBy:{
             [sortBy]:sortOrder
         },
-
         take:limit,
         skip:skip,
+
 
         include:{
             author:{
