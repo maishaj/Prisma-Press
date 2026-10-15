@@ -211,13 +211,12 @@ const getAllPosts=async(query:IPostQuery)=>{
             AND:andConditions
         },
 
-          // Dynamic Pagination Sorting
+        // Dynamic Pagination, Sorting
         orderBy:{
             [sortBy]:sortOrder
         },
         take:limit,
         skip:skip,
-
 
         include:{
             author:{
