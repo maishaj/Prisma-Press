@@ -4,7 +4,7 @@ model Subscription{
     userId String @unique
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    currrentPeriodEnd DateTime
+    currentPeriodEnd DateTime
     status SubscriptionStatus @default(ACTIVE)
 
     //Stripe customer ids
