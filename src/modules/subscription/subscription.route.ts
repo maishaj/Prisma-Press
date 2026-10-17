@@ -9,5 +9,7 @@ router.post("/checkout",auth(Role.USER,Role.AUTHOR,Role.ADMIN),subscriptionContr
 router.post("/webhook",subscriptionController.handleWebhook);
 router.get("/status",auth(Role.USER,Role.AUTHOR,Role.ADMIN),subscriptionController.getSubscriptionStatus);
 
+// Do Cancel Subscription
+
 export const subscriptionRoutes=router;
 

@@ -4,6 +4,22 @@ import { prisma } from "../../lib/prisma"
 import { ICreatePostPayload, IPostQuery, IUpdatePostPayload } from "./post.interface"
 
 const createPost=async(payload:ICreatePostPayload, userId:string)=>{
+
+    // To handle Premium Contents
+    const user=await prisma.user.findUniqueOrThrow({
+        where:{
+            id:userId
+        },
+        include:{
+            subscription:true
+        }
+    })
+
+    if(payload.isPremium && user.subscription?.status !== "ACTIVE"){
+        throw new Error("You are not a premium user. So you can not create Premium Content!");
+    }
+
+    // To Create
     const result=await prisma.post.create({
         data:{
             ...payload,
@@ -84,6 +100,10 @@ const getAllPosts=async(query:IPostQuery)=>{
             status:query.status
         })
     }
+
+    andConditions.push({
+        isPremium:false
+    })
 
     const posts=await prisma.post.findMany({
 
@@ -227,7 +247,22 @@ const getAllPosts=async(query:IPostQuery)=>{
             comments:true
         }
     });
-    return posts;
+
+    const totalPostCount=await prisma.post.count({
+        where:{
+            AND:andConditions
+        }
+    })
+
+    return {
+        data:posts,
+        meta:{
+          page:page,
+          limit:limit,
+          total:totalPostCount,
+          totalPages:Math.ceil(totalPostCount/limit)
+        }
+    }
 }
 
 const getPostsStats=async()=>{
@@ -323,7 +358,7 @@ const getPostById=async(postId:string)=>{
         async(tx)=>{
             await tx.post.update({
                 where:{
-                    id:postId
+                    id:postId,
                 },
                 data:{
                     views:{
@@ -334,7 +369,8 @@ const getPostById=async(postId:string)=>{
 
             const post=await tx.post.findUniqueOrThrow({
                 where:{
-                    id:postId
+                    id:postId,
+                    isPremium:false
                 },
                 include:{
                     author:{

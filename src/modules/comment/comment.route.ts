@@ -7,7 +7,7 @@ const router=Router();
 
 router.post("/",auth(Role.USER,Role.ADMIN,Role.AUTHOR),commentController.createComment);
 router.get("/author/:authorId",commentController.getCommentByAuthorId);
-router.get("/:commentId",commentController.getCommentByCommentId);
+router.get("/:postId",commentController.getCommentByPostId);
 router.put("/:commentId",auth(Role.USER,Role.ADMIN,Role.AUTHOR),commentController.updateComment);
 router.delete("/:commentId",auth(Role.USER,Role.ADMIN,Role.AUTHOR),commentController.deleteComment);
 router.put("/:commentId/moderate",auth(Role.ADMIN),commentController.moderateComment);

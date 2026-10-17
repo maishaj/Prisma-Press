@@ -30,7 +30,8 @@ const getAllPosts = catchAsync(async (req: Request, res: Response, next: NextFun
         success:true,
         statusCode:httpStatus.OK,
         message:"Posts retrieved successfully.",
-        data: result
+        data: result.data,
+        meta:result.meta
     })
 });
 
